@@ -4,8 +4,11 @@
  */
 package scoutingsystem;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 import javax.swing.InputVerifier;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 
@@ -13,26 +16,43 @@ import javax.swing.JTextField;
  *
  * @author John
  */
-public class RVTextField extends JTextField implements RVComponent{
+public class RVTimerButton extends JButton implements ActionListener, Runnable, RVComponent{
     Field myValue;
-    public RVTextField()
+    boolean timer = false;
+    long startTime = 0;
+    long totalTime = 0;
+    RVTextField display;
+    String field = "";
+    public RVTextField getDisplay() {
+        return display;
+    }
+
+    public void setDisplay(RVTextField display) {
+        this.display = display;
+    }
+    public RVTimerButton()
     {
         super();
         addVerifier();
     }
-    public RVTextField(Field myValue)
+    public RVTimerButton(Field myValue, RVTextField mine)
     {
         super();
         this.myValue = myValue;
+        this.display = mine;
         addVerifier();
     }
     public final void addVerifier()
     {
+        Thread me = new Thread(this);
+        me.start();
+        this.setActionCommand("PRESS");
+        this.addActionListener(this);
         this.setInputVerifier(new InputVerifier() {
 
             @Override
             public boolean verify(JComponent jc) {
-                ((RVTextField)jc).update();
+                
                 return true;
             }
         });
@@ -42,7 +62,7 @@ public class RVTextField extends JTextField implements RVComponent{
         this.myValue = DataScheme.getField(myValue);
         this.getInputVerifier().verify(this);
     }
-    public void setValue(Object value)
+    public void setValued(long value)
     {
         try {
             myValue.set(null, value);
@@ -51,41 +71,35 @@ public class RVTextField extends JTextField implements RVComponent{
         }
     }
 
-    public void update()
-    {
-        try
+    @Override
+    public void actionPerformed(ActionEvent ae) {
+        startTime = System.currentTimeMillis();
+        timer = !timer;
+        setValued(totalTime);
+    }
+
+    @Override
+    public void run() {
+        while (true)
         {
-            if (myValue.getType()==Integer.TYPE)
+            if (timer)
             {
-                setValue((int)Double.parseDouble(this.getText()));
-                if (getText().isEmpty())
-                {
-                    setText("0");
-                }
+                totalTime += System.currentTimeMillis()-startTime;
+                startTime = System.currentTimeMillis();
+                display.setText(""+(totalTime/1000d));
+                display.setValue(totalTime);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {}
             }
-            if (myValue.getType()==Double.TYPE)
-            {
-                setValue(Double.parseDouble(this.getText()));
-                if (getText().isEmpty())
-                {
-                    setText("0");
-                }
-            }
-            if (myValue.getType()==String.class)
-            {
-                setValue(this.getText());
-            }
-        }
-        catch (Exception e)
-        {
-            
         }
     }
 
     @Override
     public void reset() {
-        setText(startingValue.toString());
-        update();
+        totalTime = 0;
+        timer = false;
+        setValued(0);
     }
     public boolean resetAble = true;
     @Override
@@ -109,4 +123,4 @@ public class RVTextField extends JTextField implements RVComponent{
     {
         return this.startingValue;
     }
-}
+ }

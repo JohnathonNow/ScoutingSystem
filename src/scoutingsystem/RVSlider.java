@@ -7,20 +7,20 @@ package scoutingsystem;
 import java.lang.reflect.Field;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
-import javax.swing.JTextField;
+import javax.swing.JSlider;
 
 /**
  *
  * @author John
  */
-public class RVTextField extends JTextField implements RVComponent{
+public class RVSlider extends JSlider implements RVComponent{
     Field myValue;
-    public RVTextField()
+    public RVSlider()
     {
         super();
         addVerifier();
     }
-    public RVTextField(Field myValue)
+    public RVSlider(Field myValue)
     {
         super();
         this.myValue = myValue;
@@ -32,7 +32,7 @@ public class RVTextField extends JTextField implements RVComponent{
 
             @Override
             public boolean verify(JComponent jc) {
-                ((RVTextField)jc).update();
+                ((RVSlider)jc).update();
                 return true;
             }
         });
@@ -42,7 +42,7 @@ public class RVTextField extends JTextField implements RVComponent{
         this.myValue = DataScheme.getField(myValue);
         this.getInputVerifier().verify(this);
     }
-    public void setValue(Object value)
+    public void setValued(int value)
     {
         try {
             myValue.set(null, value);
@@ -53,38 +53,12 @@ public class RVTextField extends JTextField implements RVComponent{
 
     public void update()
     {
-        try
-        {
-            if (myValue.getType()==Integer.TYPE)
-            {
-                setValue((int)Double.parseDouble(this.getText()));
-                if (getText().isEmpty())
-                {
-                    setText("0");
-                }
-            }
-            if (myValue.getType()==Double.TYPE)
-            {
-                setValue(Double.parseDouble(this.getText()));
-                if (getText().isEmpty())
-                {
-                    setText("0");
-                }
-            }
-            if (myValue.getType()==String.class)
-            {
-                setValue(this.getText());
-            }
-        }
-        catch (Exception e)
-        {
-            
-        }
+       setValued(this.getValue());
     }
 
     @Override
     public void reset() {
-        setText(startingValue.toString());
+        this.setValue(this.getMinimum());
         update();
     }
     public boolean resetAble = true;

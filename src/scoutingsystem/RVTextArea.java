@@ -7,20 +7,20 @@ package scoutingsystem;
 import java.lang.reflect.Field;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
-import javax.swing.JTextField;
+import javax.swing.JTextArea;
 
 /**
  *
  * @author John
  */
-public class RVTextField extends JTextField implements RVComponent{
+public class RVTextArea extends JTextArea implements RVComponent {
     Field myValue;
-    public RVTextField()
+    public RVTextArea()
     {
         super();
         addVerifier();
     }
-    public RVTextField(Field myValue)
+    public RVTextArea(Field myValue)
     {
         super();
         this.myValue = myValue;
@@ -32,7 +32,7 @@ public class RVTextField extends JTextField implements RVComponent{
 
             @Override
             public boolean verify(JComponent jc) {
-                ((RVTextField)jc).update();
+                ((RVTextArea)jc).update();
                 return true;
             }
         });
@@ -58,18 +58,10 @@ public class RVTextField extends JTextField implements RVComponent{
             if (myValue.getType()==Integer.TYPE)
             {
                 setValue((int)Double.parseDouble(this.getText()));
-                if (getText().isEmpty())
-                {
-                    setText("0");
-                }
             }
             if (myValue.getType()==Double.TYPE)
             {
                 setValue(Double.parseDouble(this.getText()));
-                if (getText().isEmpty())
-                {
-                    setText("0");
-                }
             }
             if (myValue.getType()==String.class)
             {
@@ -84,7 +76,7 @@ public class RVTextField extends JTextField implements RVComponent{
 
     @Override
     public void reset() {
-        setText(startingValue.toString());
+        this.setText(startingValue.toString());
         update();
     }
     public boolean resetAble = true;

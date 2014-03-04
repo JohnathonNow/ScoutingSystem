@@ -6,21 +6,21 @@ package scoutingsystem;
 
 import java.lang.reflect.Field;
 import javax.swing.InputVerifier;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JTextField;
 
 /**
  *
  * @author John
  */
-public class RVTextField extends JTextField implements RVComponent{
+public class RVComboBox extends JComboBox  implements RVComponent{
     Field myValue;
-    public RVTextField()
+    public RVComboBox()
     {
         super();
         addVerifier();
     }
-    public RVTextField(Field myValue)
+    public RVComboBox(Field myValue)
     {
         super();
         this.myValue = myValue;
@@ -32,7 +32,7 @@ public class RVTextField extends JTextField implements RVComponent{
 
             @Override
             public boolean verify(JComponent jc) {
-                ((RVTextField)jc).update();
+                ((RVComboBox)jc).update();
                 return true;
             }
         });
@@ -42,7 +42,7 @@ public class RVTextField extends JTextField implements RVComponent{
         this.myValue = DataScheme.getField(myValue);
         this.getInputVerifier().verify(this);
     }
-    public void setValue(Object value)
+    public void setValue(int value)
     {
         try {
             myValue.set(null, value);
@@ -53,38 +53,12 @@ public class RVTextField extends JTextField implements RVComponent{
 
     public void update()
     {
-        try
-        {
-            if (myValue.getType()==Integer.TYPE)
-            {
-                setValue((int)Double.parseDouble(this.getText()));
-                if (getText().isEmpty())
-                {
-                    setText("0");
-                }
-            }
-            if (myValue.getType()==Double.TYPE)
-            {
-                setValue(Double.parseDouble(this.getText()));
-                if (getText().isEmpty())
-                {
-                    setText("0");
-                }
-            }
-            if (myValue.getType()==String.class)
-            {
-                setValue(this.getText());
-            }
-        }
-        catch (Exception e)
-        {
-            
-        }
+       setValue(this.getSelectedIndex());
     }
-
     @Override
-    public void reset() {
-        setText(startingValue.toString());
+    public void reset()
+    {
+        this.setSelectedIndex(0);
         update();
     }
     public boolean resetAble = true;
